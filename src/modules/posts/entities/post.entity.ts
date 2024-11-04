@@ -19,7 +19,7 @@ export class Post {
   @Column({ default: null })
   media_path: string;
 
-  @ManyToOne(() => Challange, (challage) => challage.id)
+  @ManyToOne(() => Challange, (challange) => challange.id)
   challange: Challange;
 
   @CreateDateColumn()

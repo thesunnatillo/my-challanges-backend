@@ -1,26 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { ISignUpData } from './interfaces/auth.i';
+import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from '../users/entities/user.entity';
+import { Repository } from 'typeorm';
+import { LoginAlreadyUsed } from './exception/auth.exception';
+import { BcryptHashing } from '../../lib/bcrypt/bcrypt.lib';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
-  }
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
+    private readonly jwtService: JwtService,
+  ) {}
+  async signup(createAuthDto: CreateAuthDto): Promise<ISignUpData> {
+    const user = await this.userRepo.findOne({
+      where: { email: createAuthDto.email },
+    });
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+    if (user) {
+      throw new LoginAlreadyUsed();
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    const newUser = {
+      ...createAuthDto,
+      password: await BcryptHashing.hashPassword(createAuthDto.password),
+    };
+    const savedUser = await this.userRepo.save(newUser);
+    const token = await this.jwtService.signAsync({
+      id: savedUser.id,
+      email: savedUser.email,
+    });
+    return {
+      user: savedUser,
+      token: token,
+    };
   }
 }

@@ -5,7 +5,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 @Injectable()
 export class PostsService {
   create(createPostDto: CreatePostDto) {
-    return 'This action adds a new post';
+    return createPostDto;
   }
 
   findAll() {
@@ -17,7 +17,7 @@ export class PostsService {
   }
 
   update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+    return updatePostDto;
   }
 
   remove(id: number) {

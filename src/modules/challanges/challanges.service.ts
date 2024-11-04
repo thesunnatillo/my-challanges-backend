@@ -5,7 +5,7 @@ import { UpdateChallangeDto } from './dto/update-challange.dto';
 @Injectable()
 export class ChallangesService {
   create(createChallangeDto: CreateChallangeDto) {
-    return 'This action adds a new challange';
+    return createChallangeDto;
   }
 
   findAll() {
@@ -17,7 +17,7 @@ export class ChallangesService {
   }
 
   update(id: number, updateChallangeDto: UpdateChallangeDto) {
-    return `This action updates a #${id} challange`;
+    return updateChallangeDto;
   }
 
   remove(id: number) {
