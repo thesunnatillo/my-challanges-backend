@@ -4,3 +4,7 @@ export interface ISignUpData {
   user: User;
   token: string;
 }
+
+export interface ILogInData {
+  token: string;
+}

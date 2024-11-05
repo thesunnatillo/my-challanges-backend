@@ -22,17 +22,14 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ length: 250 })
+  @Column({ length: 250, default: 'Hey, I am joined this site!' })
   bio: string;
 
-  @Column()
+  @Column({ default: null })
   profile_pic: string;
 
   @Column({ default: false })
   isAdmin: boolean;
-
-  @Column()
-  refresh_token: string;
 
   @OneToMany(() => Challange, (challange) => challange.user)
   challanges: Challange[];

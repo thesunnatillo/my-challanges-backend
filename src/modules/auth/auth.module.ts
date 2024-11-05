@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import * as dotenv from 'dotenv';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../users/entities/user.entity';
+import { RedisService } from '../../lib/redis/redis.service';
 dotenv.config();
 
 @Module({
@@ -13,10 +14,10 @@ dotenv.config();
     JwtModule.register({
       global: true,
       secret: process.env.SECRET,
-      signOptions: { expiresIn: '60s' },
+      signOptions: { expiresIn: '1h' },
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, RedisService],
 })
 export class AuthModule {}
