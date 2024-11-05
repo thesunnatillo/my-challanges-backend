@@ -1,45 +1,40 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
+  Req,
   Patch,
   Param,
   Delete,
 } from '@nestjs/common';
-import { ChallangesService } from './challanges.service';
-import { CreateChallangeDto } from './dto/create-challange.dto';
-import { UpdateChallangeDto } from './dto/update-challange.dto';
+import { ChallengesService } from './challanges.service';
+import { CreateChallengeDto } from './dto/create-challange.dto';
+import { Request } from 'express';
+import { UpdateChallengeDto } from './dto/update-challange.dto';
 
-@Controller('challanges')
-export class ChallangesController {
-  constructor(private readonly challangesService: ChallangesService) {}
+@Controller('challenges')
+export class ChallengesController {
+  constructor(private readonly challengesService: ChallengesService) {}
 
-  @Post()
-  create(@Body() createChallangeDto: CreateChallangeDto) {
-    return this.challangesService.create(createChallangeDto);
+  @Post('create')
+  create(@Body() createChallengeDto: CreateChallengeDto, @Req() req: Request) {
+    const token = req.headers.authorization.split(' ')[1];
+    return this.challengesService.create(createChallengeDto, token);
   }
 
-  @Get()
-  findAll() {
-    return this.challangesService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.challangesService.findOne(+id);
-  }
-
-  @Patch(':id')
+  @Patch('update/:id')
   update(
-    @Param('id') id: string,
-    @Body() updateChallangeDto: UpdateChallangeDto,
+    @Param('id') id: number,
+    @Body() updateChallengeDto: UpdateChallengeDto,
+    @Req() req: Request,
   ) {
-    return this.challangesService.update(+id, updateChallangeDto);
+    const token = req.headers.authorization.split(' ')[1];
+    return this.challengesService.update(updateChallengeDto, token, id);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.challangesService.remove(+id);
+  @Delete('delete/:id')
+  delete(@Param('id') id: number, @Req() req: Request) {
+    const token = req.headers.authorization.split(' ')[1];
+    return this.challengesService.delete(id, token);
   }
 }

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from './modules/auth/auth.module';
-import { ChallangesModule } from './modules/challanges/challanges.module';
+import { ChallengesModule } from './modules/challanges/challanges.module';
 import { PostsModule } from './modules/posts/posts.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { UserFollowsModule } from './modules/user-follows/user-follows.module';
@@ -15,7 +15,7 @@ dotenv.config();
 @Module({
   imports: [
     AuthModule,
-    ChallangesModule,
+    ChallengesModule,
     PostsModule,
     AdminModule,
     UsersModule,
