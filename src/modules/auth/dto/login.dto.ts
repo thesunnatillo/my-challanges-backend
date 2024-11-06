@@ -1,7 +1,7 @@
 import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 
 export class LogInDto {
-  @IsEmail({}, { message: 'Email xato farmatda kiritildi!'})
+  @IsEmail({}, { message: 'Email xato farmatda kiritildi!' })
   email: string;
 
   @IsNotEmpty({ message: 'Parol kiritilishi shart' })
