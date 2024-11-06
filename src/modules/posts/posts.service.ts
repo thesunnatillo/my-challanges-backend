@@ -1,26 +1,80 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Post } from './entities/post.entity';
+import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
+import { join } from 'path';
+import { writeFileSync } from 'fs';
+import { Challange } from '../challanges/entities/challange.entity';
+import { PostI } from './interfaces/post.i';
 
 @Injectable()
 export class PostsService {
-  create(createPostDto: CreatePostDto) {
-    return createPostDto;
-  }
+  constructor(
+    @InjectRepository(Post)
+    private readonly postRepo: Repository<Post>,
+    @InjectRepository(Challange)
+    private readonly challengesRepo: Repository<Challange>,
+    private readonly jwtService: JwtService,
+  ) {}
+  async create(
+    createPostDto: CreatePostDto,
+    challenge_id: number,
+    token: string,
+    file?: Express.Multer.File,
+  ): Promise<PostI> {
+    try {
+      let filePath: string;
+      if (!file) {
+        filePath = null;
+      } else {
+        filePath = join(
+          __dirname,
+          '..',
+          '..',
+          '..',
+          '..',
+          'uploads',
+          file.originalname,
+        );
+        writeFileSync(filePath, file.buffer);
+      }
 
-  findAll() {
-    return `This action returns all posts`;
-  }
+      const payload = await this.jwtService.verify(token);
+      /////////////////////////////////////////////////////////////
+      const challenges = await this.challengesRepo.find({
+        where: { user: { id: payload.id } },
+      });
+      console.log(challenges);
+      let matchChallengeCount = 0;
+      for (let i = 0; i < challenges.length; i++) {
+        const challengeId = challenges[i].id;
+        if (challenge_id != challengeId) {
+          matchChallengeCount++;
+        }
+      }
+      if (matchChallengeCount === challenges.length) {
+        throw new UnauthorizedException('Bu sizning challenge emas!');
+      }
+      //////////////////////////////////////////////////////////
+      const challenge = await this.challengesRepo.findOne({
+        where: { id: challenge_id },
+      });
 
-  findOne(id: number) {
-    return `This action returns a #${id} post`;
-  }
+      const newPost = this.postRepo.create({
+        ...createPostDto,
+        media_path: filePath,
+        challange: challenge,
+      });
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return updatePostDto;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+      const savedPost = await this.postRepo.save(newPost);
+      return {
+        post: savedPost,
+        message: 'Saved Post',
+      };
+    } catch (e) {
+      return e;
+    }
   }
 }
