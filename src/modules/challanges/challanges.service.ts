@@ -73,7 +73,7 @@ export class ChallengesService {
 
   async delete(id: number, token: string) {
     try {
-      // onst challenge_find = await this.challengesRepo.find({
+      // const challenge_find = await this.challengesRepo.find({
       //   where: { id: id },
       // });
       const payload = await this.jwtService.verify(token);
