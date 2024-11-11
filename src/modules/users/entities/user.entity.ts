@@ -31,6 +31,9 @@ export class User {
   @Column({ default: false })
   isAdmin: boolean;
 
+  @Column({ default: false })
+  isBlocked: boolean;
+
   @OneToMany(() => Challange, (challange) => challange.user)
   challanges: Challange[];
 

@@ -8,6 +8,7 @@ import { join } from 'path';
 import { writeFileSync } from 'fs';
 import { Challange } from '../challanges/entities/challange.entity';
 import { PostI } from './interfaces/post.i';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 @Injectable()
 export class PostsService {
@@ -25,6 +26,7 @@ export class PostsService {
     file?: Express.Multer.File,
   ): Promise<PostI> {
     try {
+      const payload = await this.jwtService.verify(token);
       let filePath: string;
       if (!file) {
         filePath = null;
@@ -41,12 +43,10 @@ export class PostsService {
         writeFileSync(filePath, file.buffer);
       }
 
-      const payload = await this.jwtService.verify(token);
       /////////////////////////////////////////////////////////////
       const challenges = await this.challengesRepo.find({
         where: { user: { id: payload.id } },
       });
-      console.log(challenges);
       let matchChallengeCount = 0;
       for (let i = 0; i < challenges.length; i++) {
         const challengeId = challenges[i].id;
@@ -72,6 +72,82 @@ export class PostsService {
       return {
         post: savedPost,
         message: 'Saved Post',
+      };
+    } catch (e) {
+      return e;
+    }
+  }
+
+  async update(
+    updatePostDto: UpdatePostDto,
+    challenge_id: number,
+    post_id: number,
+    token: string,
+  ): Promise<PostI> {
+    try {
+      const payload = await this.jwtService.verify(token);
+      /////////////////////////////////////////////////////////////
+      const challenges = await this.challengesRepo.find({
+        where: { user: { id: payload.id } },
+      });
+      console.log(challenges);
+      let matchChallengeCount = 0;
+      for (let i = 0; i < challenges.length; i++) {
+        const challengeId = challenges[i].id;
+        if (challenge_id != challengeId) {
+          matchChallengeCount++;
+        }
+      }
+      if (matchChallengeCount === challenges.length) {
+        throw new UnauthorizedException('Bu sizing challenge ems!');
+      }
+      //////////////////////////////////////////////////////////
+      const post = await this.postRepo.findOne({ where: { id: post_id } });
+      if (!post) {
+        return { message: '[404] Post topilmadi!' };
+      }
+      await this.postRepo.update(post_id, {
+        ...updatePostDto,
+      });
+      return {
+        message: 'Post updated',
+      };
+    } catch (e) {
+      return e;
+    }
+  }
+
+  async delete(
+    challenge_id: number,
+    post_id: number,
+    token: string,
+  ): Promise<PostI> {
+    try {
+      const payload = await this.jwtService.verify(token);
+      /////////////////////////////////////////////////////////////
+      const challenges = await this.challengesRepo.find({
+        where: { user: { id: payload.id } },
+      });
+      console.log(challenges);
+      let matchChallengeCount = 0;
+      for (let i = 0; i < challenges.length; i++) {
+        const challengeId = challenges[i].id;
+        if (challenge_id != challengeId) {
+          matchChallengeCount++;
+        }
+      }
+      if (matchChallengeCount === challenges.length) {
+        throw new UnauthorizedException('Bu sizing challenge ems!');
+      }
+      //////////////////////////////////////////////////////////
+      const post = await this.postRepo.findOne({ where: { id: post_id } });
+      if (!post) {
+        return { message: '[404] Post topilmadi! ' };
+      }
+
+      await this.postRepo.remove(post);
+      return {
+        message: 'Post deleted!',
       };
     } catch (e) {
       return e;
