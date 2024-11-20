@@ -4,7 +4,8 @@ import {
   Body,
   Req,
   UseInterceptors,
-  UploadedFile, Patch,
+  UploadedFile,
+  Patch,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';

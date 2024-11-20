@@ -9,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './modules/users/entities/user.entity';
 import { Challange } from './modules/challanges/entities/challange.entity';
 import { Post } from './modules/posts/entities/post.entity';
+import { HiModule } from './modules/hi/hi.module';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -29,6 +30,7 @@ dotenv.config();
       database: process.env.POSTGRES_DATABASE,
       entities: [User, Challange, Post],
     }),
+    HiModule,
   ],
   controllers: [],
   providers: [],

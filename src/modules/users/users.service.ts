@@ -21,7 +21,7 @@ export class UsersService {
     file?: Express.Multer.File,
   ): Promise<UserI> {
     try {
-      console.log(file)
+      console.log(file);
       const payload = this.jwtService.verify(token);
       let filePath: string;
       if (!file) {
@@ -43,7 +43,7 @@ export class UsersService {
         ...updateUserDto,
         profile_pic: filePath,
       });
-      console.log(jj)
+      console.log(jj);
       return {
         message: 'Updated successfully',
       };
